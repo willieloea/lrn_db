@@ -5,9 +5,9 @@
 // --- struct declarations --- //
 
 typedef struct {
-  char* buffer;
-  size_t buffer_length;
-  ssize_t input_length;
+  char* buffer;         // character buffer for REPL input
+  size_t buffer_length; // memory allocated on heap for buffer
+  ssize_t input_length; // number of characters entered so far.
 } InputBuffer;
 
 
@@ -21,7 +21,8 @@ void close_input_buffer(InputBuffer*);
 
 // --- function definitions --- //
 
-InputBuffer* new_input_buffer() {
+InputBuffer* new_input_buffer(void) {
+  // malloc returns void*, so it's good practice to do type casting
   InputBuffer* input_buffer = (InputBuffer*)malloc(sizeof(InputBuffer));
 
   input_buffer->buffer = NULL;
@@ -36,6 +37,8 @@ void print_prompt(void) {
 }
 
 void read_input(InputBuffer* input_buffer) {
+  // first arg is char** because getline() might need to reallocate memory in
+  // the case of a long string.
   ssize_t bytes_read =
     getline(&(input_buffer->buffer), &(input_buffer->buffer_length), stdin);
 
@@ -50,8 +53,8 @@ void read_input(InputBuffer* input_buffer) {
 }
 
 void close_input_buffer(InputBuffer* input_buffer) {
-  free(input_buffer->buffer);
-  free(input_buffer);
+  free(input_buffer->buffer); // frees the char array
+  free(input_buffer);         // frees the InputBuffer struct
 }
 
 
